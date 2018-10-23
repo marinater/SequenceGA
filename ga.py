@@ -37,122 +37,108 @@ class Fitness:
 
         return self.fitness
 
-def initialPopulation(popSize, targetLength):
-    population = []
+class Model():
+    def __init__(self, popSize, targetVal):
+        self.TARGET = targetVal
+        self.CURRENT_POPULATION = self.initialPopulation(popSize)
 
-    for i in range(0, popSize):
-        newElement = sequenceListFromValues(createSequence(targetLength))
-        population.append(newElement)
+    def initialPopulation(self, popSize):
+        population = []
 
-    return population
+        for i in range(0, popSize):
+            newElement = self.sequenceListFromValues(self.createSequence(len(self.TARGET)))
+            population.append(newElement)
 
-def createSequence(targetLength):
-    sequence = random.sample(string.ascii_lowercase, targetLength)
-    return sequence
+        return population
 
-def sequenceListFromValues(values):
-    returnSequenceList = []
-    for letter in values:
-        returnSequenceList.append(SequenceElement(letter))
-    return returnSequenceList
+    def createSequence(self, targetLength):
+        sequence = random.sample(string.ascii_lowercase, targetLength)
+        return sequence
 
-def rankSequences(population, targetSequence):
-    sequenceList = {}
-    rankedSequences = {}
-    for index, element in enumerate(population):
-        sequenceList[index] = Fitness(element, targetSequence).sequenceFitness()
+    def sequenceListFromValues(self, values):
+        returnSequenceList = []
+        for letter in values:
+            returnSequenceList.append(SequenceElement(letter))
+        return returnSequenceList
 
-    return sorted(sequenceList.items(), key = operator.itemgetter(1), reverse = True)
+    def rankSequences(self, population, targetSequence):
+        sequenceList = {}
+        rankedSequences = {}
+        for index, element in enumerate(population):
+            sequenceList[index] = Fitness(element, targetSequence).sequenceFitness()
 
-def selection(popRanked, eliteSize):
-    selectionResults = []
-    df = pd.DataFrame(np.array(popRanked), columns= ["Index", "Fitness"])
-    df['cumulativeSum'] = df.Fitness.cumsum()
-    df['cumulativePercentages'] = 100 * df.cumulativeSum / df.Fitness.sum()
+        return sorted(sequenceList.items(), key = operator.itemgetter(1), reverse = True)
 
-    for i in range(eliteSize):
-        selectionResults.append(popRanked[i][0])
-    for i in range(len(popRanked) - eliteSize):
-        pick = 100 * random.random()
-        for i in range(len(popRanked)):
-            if pick <= df.iat[i,3]:
-                selectionResults.append(popRanked[i][0])
-                break
-    return selectionResults
+    def selection(self, popRanked, eliteSize):
+        selectionResults = []
+        df = pd.DataFrame(np.array(popRanked), columns= ["Index", "Fitness"])
+        df['cumulativeSum'] = df.Fitness.cumsum()
+        df['cumulativePercentages'] = 100 * df.cumulativeSum / df.Fitness.sum()
 
-def MatingPool(population, selectionResults):
-    matingPool = []
+        for i in range(eliteSize):
+            selectionResults.append(popRanked[i][0])
+        for i in range(len(popRanked) - eliteSize):
+            pick = 100 * random.random()
+            for i in range(len(popRanked)):
+                if pick <= df.iat[i,3]:
+                    selectionResults.append(popRanked[i][0])
+                    break
+        return selectionResults
 
-    for i in range(len(selectionResults)):
-        index = selectionResults[i]
-        matingPool.append(population[index])
-    return matingPool
+    def MatingPool(self, population, selectionResults):
+        matingPool = []
 
-def breed(parent1, parent2):
-    child = ''
-    splicePoint = int(random.random() * len(parent1))
-    child = parent1[0:splicePoint] + parent2[splicePoint:]
-    return sequenceListFromValues(child)
+        for i in range(len(selectionResults)):
+            index = selectionResults[i]
+            matingPool.append(population[index])
+        return matingPool
 
-def breedPopulation(matingPool, eliteSize):
-    children = []
-    length = len(matingPool) - eliteSize
-    pool = random.sample(matingPool, len(matingPool))
+    def breed(self, parent1, parent2):
+        child = ''
+        splicePoint = int(random.random() * len(parent1))
+        child = parent1[0:splicePoint] + parent2[splicePoint:]
+        return self.sequenceListFromValues(child)
 
-    for i in range(0, eliteSize):
-        children.append(matingPool[i])
-    for i in range(0, length):
-        child = breed(pool[i], pool[len(matingPool) - i - 1])
-        children.append(child)
+    def breedPopulation(self, matingPool, eliteSize):
+        children = []
+        length = len(matingPool) - eliteSize
+        pool = random.sample(matingPool, len(matingPool))
 
-    return children
+        for i in range(0, eliteSize):
+            children.append(matingPool[i])
+        for i in range(0, length):
+            child = self.breed(pool[i], pool[len(matingPool) - i - 1])
+            children.append(child)
 
-def mutate(sequence, mutationRate):
-    for swapped in range(len(sequence)):
-        if(random.random() < mutationRate):
-            swappedWith = int(random.random() * len(sequence))
+        return children
 
-            sequence1 = sequence[swapped]
-            sequence2 = sequence[swappedWith]
+    def mutate(self, sequence, mutationRate):
+        for swapped in range(len(sequence)):
+            if(random.random() < mutationRate):
+                swappedWith = int(random.random() * len(sequence))
 
-            sequence[swapped] = sequence2
-            sequence[swappedWith] = sequence1
+                sequence1 = sequence[swapped]
+                sequence2 = sequence[swappedWith]
 
-    return sequence
+                sequence[swapped] = sequence2
+                sequence[swappedWith] = sequence1
 
-def mutatePopulation(population, mutationRate):
-    mutatedPop = []
+        return sequence
 
-    for ind in range(len(population)):
-        mutatedInd = mutate(population[ind], mutationRate)
-        mutatedPop.append(mutatedInd)
+    def mutatePopulation(self, population, mutationRate):
+        mutatedPop = []
 
-    return mutatedPop
+        for ind in range(len(population)):
+            mutatedInd = self.mutate(population[ind], mutationRate)
+            mutatedPop.append(mutatedInd)
 
-def nextGeneration(currentGeneration, eliteSize, mutationRate, targetSequence):
-    popRanked = rankSequences(currentGeneration, targetSequence)
-    selectionResults = selection(popRanked, eliteSize)
-    matingPool = MatingPool(currentGeneration, selectionResults)
-    children = breedPopulation(matingPool, eliteSize)
-    return mutatePopulation(children, mutationRate)
+        return mutatedPop
 
-def geneticAlgorithm(targetSequence, popSize, eliteSize, mutationRate, generations):
-    pop = initialPopulation(popSize, len(targetSequence))
-    progress = []
-
-    print("Initial minimum is:                          ", pop[rankSequences(pop, targetSequence)[0][0]])
-    print("Initial error is", (1/rankSequences(pop, targetSequence)[0][1]) )
-
-    progress.append(1 / rankSequences(pop, targetSequence)[0][1])
-    plt.ylabel('Error')
-    plt.xlabel('Generation')
-
-    for i in range(0, generations):
-        pop = nextGeneration(pop, eliteSize, mutationRate, targetSequence)
-        progress.append(1 / rankSequences(pop, targetSequence)[0][1])
-    plt.plot(progress)
-    plt.show()
-
-    print("After, 1000 generation, the final sequence is: ", pop[rankSequences(pop, targetSequence)[0][0]])
-    print("Final error is", 1 / rankSequences(pop, targetSequence)[0][1])
-geneticAlgorithm("fuckthisshit", 200, 30, 0.105, 1000)
+    def nextGeneration(self, eliteSize, mutationRate):
+        popRanked = self.rankSequences(self.CURRENT_POPULATION, self.TARGET)
+        selectionResults = self.selection(popRanked, eliteSize)
+        matingPool = self.MatingPool(self.CURRENT_POPULATION, selectionResults)
+        children = self.breedPopulation(matingPool, eliteSize)
+        self.CURRENT_POPULATION = self.mutatePopulation(children, mutationRate)
+        self.BEST_SPECIES = self.CURRENT_POPULATION[self.rankSequences(self.CURRENT_POPULATION, self.TARGET)[0][0]]
+        return self.CURRENT_POPULATION
