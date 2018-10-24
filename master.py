@@ -1,5 +1,4 @@
 from ga import *
-from 
 grid = [Model(200, "hello") for i in range(3)]
 
 for i in range(50):
