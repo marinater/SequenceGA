@@ -1,4 +1,8 @@
 from ga import *
+<<<<<<< HEAD
+=======
+grid = [Model(200, "hello") for i in range(3)]
+>>>>>>> b0215e1cdfd722d207c59a247351e40dbc12808e
 
 grid = [Model(200, "a" * 200) for i in range(200)]
 finished = [False]  * len(grid)
