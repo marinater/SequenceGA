@@ -1,9 +1,28 @@
 from ga import *
-from 
-grid = [Model(200, "hello") for i in range(3)]
 
-for i in range(50):
-    for a in grid:
-        a.nextGeneration(30, .1)
+grid = [Model(200, "a" * 200) for i in range(200)]
+finished = [False]  * len(grid)
 
-[print(a.BEST_SPECIES) for a in grid]
+for i in range(1):
+#    print('Generation {:2d} '.format(i))
+    for index, a in enumerate(grid):
+        if finished[index] == False:
+            a.nextGeneration(30, .1)
+            error = a.BEST_ERROR
+            if error == 0.0:
+                finished[index] = True
+            print('----------------------------------')
+            print(
+            '''Generation: {}
+            Error     : {:g}
+            Sequence  : {}'''.format(i, error, a.BEST_SPECIES))
+    if not False in finished:
+        break
+
+a = []
+for row in grid:
+    elements = [str(item) for item in row.BEST_SPECIES]
+    a.append(elements)
+
+import ImageMake
+ImageMake.makeImage(a)

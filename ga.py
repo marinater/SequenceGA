@@ -32,7 +32,7 @@ class Fitness:
     def sequenceFitness(self):
         if self.fitness == 0:
             if self.sequenceError() == 0:
-                return 99999999999999999999999
+                return float("inf")
             self.fitness = 1 / float(self.sequenceError())
 
         return self.fitness
@@ -52,7 +52,7 @@ class Model():
         return population
 
     def createSequence(self, targetLength):
-        sequence = random.sample(string.ascii_lowercase, targetLength)
+        sequence = np.random.choice(list(string.ascii_lowercase), targetLength, replace = True)
         return sequence
 
     def sequenceListFromValues(self, values):
@@ -140,5 +140,7 @@ class Model():
         matingPool = self.MatingPool(self.CURRENT_POPULATION, selectionResults)
         children = self.breedPopulation(matingPool, eliteSize)
         self.CURRENT_POPULATION = self.mutatePopulation(children, mutationRate)
-        self.BEST_SPECIES = self.CURRENT_POPULATION[self.rankSequences(self.CURRENT_POPULATION, self.TARGET)[0][0]]
+        best = self.rankSequences(self.CURRENT_POPULATION, self.TARGET)[0]
+        self.BEST_SPECIES = self.CURRENT_POPULATION[best[0]]
+        self.BEST_ERROR = 1 / best[1]
         return self.CURRENT_POPULATION
