@@ -3,13 +3,13 @@ import string
 
 class SequenceElement:
     def __init__(self, val):
-        self.value = str(val)
+        self.value = int(val)
 
     def error(self, targetVal):
-        return abs(ord(targetVal) - ord(self.value))
+        return abs(targetVal - self.value) ** 2
 
     def __repr__(self):
-        return self.value
+        return str(self.value)
 
 class Fitness:
     def __init__(self, sequence, targetSeq):
@@ -41,6 +41,8 @@ class Model():
     def __init__(self, popSize, targetVal):
         self.TARGET = targetVal
         self.CURRENT_POPULATION = self.initialPopulation(popSize)
+        best = self.rankSequences(self.CURRENT_POPULATION, self.TARGET)[0]
+        self.BEST_SPECIES = self.CURRENT_POPULATION[best[0]]
 
     def initialPopulation(self, popSize):
         population = []
@@ -52,13 +54,13 @@ class Model():
         return population
 
     def createSequence(self, targetLength):
-        sequence = np.random.choice(list(string.ascii_lowercase), targetLength, replace = True)
+        sequence = np.random.random_integers(0, 255, targetLength)
         return sequence
 
     def sequenceListFromValues(self, values):
         returnSequenceList = []
-        for letter in values:
-            returnSequenceList.append(SequenceElement(letter))
+        for number in values:
+            returnSequenceList.append(SequenceElement(int(str(number))))
         return returnSequenceList
 
     def rankSequences(self, population, targetSequence):
@@ -94,7 +96,7 @@ class Model():
         return matingPool
 
     def breed(self, parent1, parent2):
-        child = ''
+        child = []
         splicePoint = int(random.random() * len(parent1))
         child = parent1[0:splicePoint] + parent2[splicePoint:]
         return self.sequenceListFromValues(child)

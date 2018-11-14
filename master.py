@@ -1,53 +1,38 @@
 from ga import *
 import ImageMake
+from math import floor
+import matplotlib.pyplot as plt
+from collections import deque
 
-def generateCurrentImage(name):
-    a = []
-    for row in grid:
-        elements = [str(item) for item in row.BEST_SPECIES]
-        a.append(elements)
-    ImageMake.makeImage(a, name)
+convergencePicture = ImageMake.generateMat('convergencePictures/checkerboard.jpg')
 
-print("Initializing population")
-grid = [Model(200, "aaaaazzzzz" * 2) for i in range(10)]
-print("Population initialized")
+models = [Model(80, row) for row in convergencePicture]
+s = [[int(str(x)) for x in a.BEST_SPECIES] for a in models]
+ImageMake.makeImage(convergencePicture, show=True)
+ImageMake.makeImage(s, name = 'EvolutionSnapShots/Initialized.jpg', save=True)
 
-finished = [False]  * len(grid)
-gridRows = len(grid)
+convergedRows = [False] * len(models)
+mutationRates = [.1] * len(models)
+eliteSizes = [40] * len(models)
 
+for generation in range(10000):
+    for rowIndex in range(len(models)):
+        if not convergedRows[rowIndex]:
+            mutationRate = mutationRates[rowIndex]
 
-for i in range(1):
-    generationError = 0
-    print('Generation {:<30}'.format(str(i)))
-    for index, a in enumerate(grid):
-        if finished[index] == False:
-            a.nextGeneration(30, .1)
-            error = a.BEST_ERROR
-            generationError += error
-            if error == 0.0:
-                finished[index] = True
-            percentComplete = int((index / gridRows) * 30) + 1
-            print('\r|{:<30}|'.format('*'*percentComplete), end='')
-    print('\r',end='')
-    if not False in finished:
+            model = models[rowIndex]
+            model.nextGeneration(eliteSizes[rowIndex], mutationRate)
+
+            error = model.BEST_ERROR
+
+            print('\rGeneration {:3d}: Row {:2d}: {:.2f}'.format(generation, rowIndex, error), end='')
+
+            if error < 800:
+                convergedRows[rowIndex] = True
+
+    s = [[int(str(x)) for x in a.BEST_SPECIES] for a in models]
+#    ImageMake.makeImage(s, name='EvolutionSnapShots/{}.jpg'.format(generation), save=True)
+    ImageMake.makeImage(s, name='EvolutionSnapShots/0.jpg', save=True)
+
+    if not False in convergedRows:
         break
-
-generateCurrentImage('initalized.jpg')
-
-for i in range(100):
-    generationError = 0
-    print('Generation {:<30}'.format(str(i)))
-    for index, a in enumerate(grid):
-        if finished[index] == False:
-            a.nextGeneration(30, .1)
-            error = a.BEST_ERROR
-            generationError += error
-            if error == 0.0:
-                finished[index] = True
-            percentComplete = int((index / gridRows) * 30) + 1
-            print('\r|{:<30}|'.format('*'*percentComplete), end='')
-    print('\r',end='')
-    if not False in finished:
-        break
-
-generateCurrentImage('output.jpg')
