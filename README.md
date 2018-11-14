@@ -1,7 +1,7 @@
-#A Genetic Algorithm for Images
-#Overview
+# A Genetic Algorithm for Images
+# Overview
 Genetic Algorithms are a form of Machine Learning that use the process of Natural Selection to generate an ideal solution to a problem. The flexibility of Genetic Algorithms make it ideal for situations that are NP-Hard or not representable by other forms of Machine Learning. For a Genetic Algorithm to work, the only necessary components are that solutions must be representable in a way that can be recombined and that there must be a way to quantifiably say how ‘good’ a solution is.
-#Steps to a generic Genetic Algorithm
+# Steps to a generic Genetic Algorithm
 Initialization
 A population of possible solutions is generated
 In most cases, the population is randomly generated, but it is possible to start the population with already known solutions so the algorithm can further optimize them.
@@ -21,7 +21,7 @@ Replace
 Discard the previous population and replace it with the new population generated
 Repeat steps 2 - 4 until convergence
 
-	While very abstract, the takeaway is that Genetic Algorithms follow the steps of Natural Selection almost to the tee. Granted, the digital representation of the population differs, but the key steps of selection, crossing-over, and mutations make Genetic Algorithms able to solve problems not able to be optimized by other means of Machine Learning.
+While very abstract, the takeaway is that Genetic Algorithms follow the steps of Natural Selection almost to the tee. Granted, the digital representation of the population differs, but the key steps of selection, crossing-over, and mutations make Genetic Algorithms able to solve problems not able to be optimized by other means of Machine Learning.
 
-#My Project
+# My Project
 	As a challenge, I decided to make my own Genetic Algorithm that starts with a population of randomly generated ‘images’ and converges it towards a final (pre-specified) picture. The videos are compilations of the top rated solution from each generation, over the course of approximately 8,000 generations. Whereas the original image starts out mostly as static, you can see how the algorithm gets closer and closer over time to the checkerboard pattern it was set to converge to. As a bonus, I included a compilation of my algorithm doing the same for a “Creeper” from Minecraft, but the algorithm didn’t run long enough for the image to fully converge.
